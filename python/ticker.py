@@ -34,7 +34,7 @@ import re
 import threading
 import time
 import finnhub
-import vim
+import vim # pylint: disable=E0401
 
 
 TIME_FORMAT = '%m-%d-%Y %H:%M:%S'
@@ -484,7 +484,7 @@ def start_display_refresh(params: dict):
       params:
         The value of g:ticker_parameters.
     """
-    global UPDATER
+    global UPDATER # pylint: disable=W0603
     if UPDATER is None:
         UPDATER = TickerUpdater(params)
         while not UPDATER.is_running():
@@ -496,7 +496,7 @@ def stop_display_refresh():
 
     Wait for the updater thread to stop, then destroy the object.
     """
-    global UPDATER
+    global UPDATER # pylint: disable=W0603
     if UPDATER is not None:
         UPDATER.stop()
         del UPDATER
