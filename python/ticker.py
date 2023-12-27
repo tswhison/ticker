@@ -156,15 +156,20 @@ def get_cached_quotes(params: dict, tickers: list) -> dict:
             try:
                 quotes = json.load(fp)
             except json.JSONDecodeError as jde:
-                print(f'ticker json decode error: {jde.msg} line: {jde.lineno} col: {jde.colno}')
+                print(f'ticker json decode error: {jde.msg} '
+                      f'line: {jde.lineno} col: {jde.colno}')
+            else:
+                next_update = datetime.strptime(quotes['next_update'],
+                                                TIME_FORMAT)
+                del quotes['next_update']
+
         if quotes and set(quotes.keys()) == set(tickers):
             for t in tickers:
                 quotes[t]['ticker'] = t
-            next_update = datetime.strptime(quotes['next_update'], TIME_FORMAT)
-            del quotes['next_update']
             # Do the quotes need refreshing?
             if next_update > datetime.now():
                 return quotes
+
     # Refresh all the quote data, updating the quote cache file.
     quotes = update_cache(params, tickers)
     del quotes['next_update']
@@ -418,15 +423,17 @@ class TickerUpdater:
             self.running = True
 
             while True:
-                sleep_for = self.next_update - datetime.now()
-                with self.cond_var:
-                    res = self.cond_var.wait(float(sleep_for.seconds))
                 if self.time_to_stop:
                     break
-                if not res: # timed out
+                now = datetime.now()
+                if now >= self.next_update:
                     vim.eval('ticker#RefreshQuoteDataNow()')
                     self.next_update = \
                         self.get_next_update_time(self.quote_cache_file)
+                else:
+                    sleep_for = self.next_update - now
+                    with self.cond_var:
+                        self.cond_var.wait(float(sleep_for.seconds))
 
             self.running = False
 
