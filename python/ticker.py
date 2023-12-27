@@ -68,13 +68,13 @@ def getCachedQuotes(params, tickers):
                 quotes = json.load(fp)
             except json.JSONDecodeError as jde:
                 print(f'ticker json decode error: {jde.msg} line: {jde.lineno} col: {jde.colno}')
-        if quotes:
+        if quotes and set(quotes.keys()) == set(tickers):
             for t in tickers:
                 quotes[t]['ticker'] = t
             nextUpdate = datetime.strptime(quotes['next_update'], TIME_FORMAT)
             del quotes['next_update']
-            # Do the quotes need refreshing? Or did the tracked tickers change, requiring a refresh?
-            if nextUpdate > datetime.now() and set(quotes.keys()) == set(tickers):
+            # Do the quotes need refreshing?
+            if nextUpdate > datetime.now():
                 return quotes
 
     quotes = updateCache(params, tickers)
