@@ -117,7 +117,7 @@ let g:ticker_parameters = {
 \}
 
 function! ticker#RefreshQuoteDataNow()
-  py3 ticker.refreshQuoteDataNow(vim.eval('g:ticker_parameters'), vim.eval('g:ticker_portfolio'))
+  py3 ticker.refresh_quote_data_now(vim.eval('g:ticker_parameters'), vim.eval('g:ticker_portfolio'))
   " If we're currently displaying, then force a refresh.
   if ticker#IsDisplaying()
     call ticker#_Hide()
@@ -128,7 +128,7 @@ endfunction
 function! ticker#GetTickerDisplayData()
   " Convert g:ticker_portfolio into a display data structure
   let g:ticker_display_data = {}
-  py3 vim.command("let g:ticker_display_data = %s" % (ticker.getTickerData(vim.eval('g:ticker_parameters'), vim.eval('g:ticker_portfolio'))))
+  py3 vim.command("let g:ticker_display_data = %s" % (ticker.get_ticker_data(vim.eval('g:ticker_parameters'), vim.eval('g:ticker_portfolio'))))
   return g:ticker_display_data
 endfunction
 
@@ -146,7 +146,7 @@ function! ticker#Display()
 
   call ticker#_Display()
 
-  py3 ticker.startDisplayRefresh(vim.eval('g:ticker_parameters'))
+  py3 ticker.start_display_refresh(vim.eval('g:ticker_parameters'))
 endfunction
 
 function! ticker#_Display()
@@ -244,7 +244,7 @@ function ticker#Hide()
     return
   endif
 
-  py3 ticker.stopDisplayRefresh(vim.eval('g:ticker_parameters'))
+  py3 ticker.stop_display_refresh()
 
   call ticker#_Hide()
 endfunction
